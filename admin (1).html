@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin – Hồng Quân</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg-1:#060818; --bg-2:#0c1030;
+  --neon-blue:#00e5ff; --neon-purple:#b14dff; --neon-pink:#ff4dd2;
+  --text:#e8f2ff; --muted:#8fa5c9;
+  --card-bg:rgba(15,22,50,0.75); --border:rgba(0,229,255,0.35);
+  --green:#00ff88; --red:#ff4d6d; --yellow:#ffcc00;
+}
+html,body {
+  min-height:100%; font-family:'Quicksand',sans-serif;
+  color:var(--text);
+  background: radial-gradient(circle at 20% 10%, #1a0a4a 0%, transparent 40%),
+              radial-gradient(circle at 80% 90%, #062a4a 0%, transparent 45%),
+              linear-gradient(135deg, var(--bg-1), var(--bg-2));
+  background-attachment:fixed;
+}
+.login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+.login-box {
+  width:100%; max-width:420px; background:var(--card-bg); border:1px solid var(--border);
+  border-radius:18px; padding:36px 28px; backdrop-filter:blur(10px);
+  box-shadow:0 8px 40px rgba(0,0,0,0.5), 0 0 40px rgba(0,229,255,0.15);
+  animation: fadeUp 0.5s ease;
+}
+.login-box h1 {
+  font-family:'Orbitron',sans-serif; font-size:26px; text-align:center;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple),var(--neon-pink));
+  -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:8px;
+}
+.login-box p.sub { text-align:center; color:var(--muted); margin-bottom:26px; font-size:13px; }
+
+.container { max-width:1200px; margin:0 auto; padding:24px 16px 60px; }
+.header {
+  display:flex; justify-content:space-between; align-items:center;
+  flex-wrap:wrap; gap:14px; margin-bottom:26px;
+  padding-bottom:16px; border-bottom:1px solid rgba(0,229,255,0.15);
+}
+.header h1 {
+  font-family:'Orbitron',sans-serif; font-size:24px;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.header .actions { display:flex; gap:10px; }
+
+.card {
+  background:var(--card-bg); border:1px solid var(--border);
+  border-radius:16px; padding:24px 20px; margin-bottom:24px;
+  backdrop-filter:blur(10px); box-shadow:0 8px 40px rgba(0,0,0,0.4);
+}
+.card h2 {
+  font-family:'Orbitron',sans-serif; font-size:18px; margin-bottom:18px;
+  color:#fff; text-shadow:0 0 14px var(--neon-blue);
+}
+
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:640px) { .form-row { grid-template-columns:1fr; } }
+.form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+@media (max-width:768px) { .form-row-3 { grid-template-columns:1fr; } }
+
+.form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+.form-group label { font-size:13px; font-weight:600; color:var(--neon-blue); letter-spacing:0.3px; }
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding:11px 14px; background:rgba(6,12,30,0.85);
+  border:1px solid rgba(0,229,255,0.3); border-radius:10px;
+  color:var(--text); font-family:inherit; font-size:14px;
+  outline:none; transition:border 0.25s, box-shadow 0.25s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color:var(--neon-purple); box-shadow:0 0 0 3px rgba(177,77,255,0.25);
+}
+.form-group select option { background:#0c1030; color:#fff; }
+
+.btn {
+  padding:12px 20px; border:none; border-radius:10px;
+  font-family:'Orbitron',sans-serif; font-size:14px; font-weight:700;
+  color:#fff; cursor:pointer; transition:transform 0.2s, filter 0.3s;
+}
+.btn:hover { transform:translateY(-2px); filter:brightness(1.1); }
+.btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+.btn-primary { background:linear-gradient(135deg,#0077ff,var(--neon-blue)); box-shadow:0 0 15px rgba(0,229,255,0.5); }
+.btn-secondary { background:linear-gradient(135deg,#7a00ff,var(--neon-purple)); box-shadow:0 0 15px rgba(177,77,255,0.5); }
+.btn-danger { background:linear-gradient(135deg,#ff0055,#ff4d6d); box-shadow:0 0 15px rgba(255,77,109,0.5); }
+.btn-success { background:linear-gradient(135deg,#00aa55,var(--green)); box-shadow:0 0 15px rgba(0,255,136,0.5); color:#001a10; }
+.btn-sm { padding:6px 12px; font-size:12px; }
+.btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text); }
+.btn-ghost.active { background:rgba(0,229,255,0.15); border-color:var(--neon-blue); color:var(--neon-blue); }
+
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:14px; }
+table th, table td { padding:12px 10px; text-align:left; border-bottom:1px solid rgba(0,229,255,0.12); }
+table th { font-family:'Orbitron',sans-serif; font-size:12px; color:var(--neon-blue); letter-spacing:0.5px; text-transform:uppercase; }
+table td.key-cell { font-family:monospace; font-weight:700; color:var(--neon-blue); cursor:pointer; letter-spacing:0.5px; }
+table td.key-cell:hover { text-shadow:0 0 8px var(--neon-blue); }
+table tr:hover { background:rgba(0,229,255,0.04); }
+
+.badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:700; letter-spacing:0.3px; }
+.badge.active { background:rgba(0,255,136,0.15); color:var(--green); border:1px solid rgba(0,255,136,0.4); }
+.badge.locked { background:rgba(255,77,109,0.15); color:var(--red); border:1px solid rgba(255,77,109,0.4); }
+.badge.expired { background:rgba(255,204,0,0.15); color:var(--yellow); border:1px solid rgba(255,204,0,0.4); }
+
+.msg { padding:12px 14px; border-radius:10px; font-size:14px; margin-top:14px; display:none; line-height:1.5; }
+.msg.show { display:block; animation:fadeIn 0.3s ease; }
+.msg.success { background:rgba(0,200,120,0.12); border:1px solid rgba(0,200,120,0.5); color:#6effc0; }
+.msg.error { background:rgba(255,60,100,0.12); border:1px solid rgba(255,60,100,0.5); color:#ff8ba5; }
+
+.stats { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:20px; }
+@media (max-width:768px) { .stats { grid-template-columns:repeat(2, 1fr); } }
+.stat { background:var(--card-bg); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center; }
+.stat .num { font-family:'Orbitron',sans-serif; font-size:28px; font-weight:900;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));
+  -webkit-background-clip:text; background-clip:text; color:transparent; }
+.stat .label { font-size:12px; color:var(--muted); margin-top:4px; letter-spacing:0.5px; }
+
+.hidden { display:none !important; }
+
+@keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+@keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+
+.toast {
+  position:fixed; bottom:24px; right:24px;
+  background:linear-gradient(135deg,#00aa55,var(--green));
+  color:#001a10; padding:12px 20px; border-radius:12px;
+  font-weight:700; font-size:14px;
+  box-shadow:0 8px 30px rgba(0,255,136,0.4);
+  transform:translateY(120%); transition:transform 0.4s ease; z-index:9999;
+}
+.toast.show { transform:translateY(0); }
+.toast.error { background:linear-gradient(135deg,#ff0055,var(--red)); color:#fff; }
+</style>
+</head>
+<body>
+
+<div id="loginView" class="login-wrap">
+  <div class="login-box">
+    <h1>🔐 ADMIN LOGIN</h1>
+    <p class="sub">Hồng Quân – Giải Bài Tập Tin</p>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="password">Mật khẩu quản trị</label>
+        <input type="password" id="password" placeholder="Nhập mật khẩu..." required />
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Đăng nhập</button>
+      <div class="msg error" id="loginMsg"></div>
+    </form>
+  </div>
+</div>
+
+<div id="mainView" class="container hidden">
+  <div class="header">
+    <h1>⚙️ Quản trị KEY</h1>
+    <div class="actions">
+      <button class="btn btn-ghost btn-sm" id="refreshBtn">🔄 Làm mới</button>
+      <button class="btn btn-danger btn-sm" id="logoutBtn">Đăng xuất</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="num" id="statTotal">0</div><div class="label">Tổng KEY</div></div>
+    <div class="stat"><div class="num" id="statActive">0</div><div class="label">Đang hoạt động</div></div>
+    <div class="stat"><div class="num" id="statLocked">0</div><div class="label">Đã khóa</div></div>
+    <div class="stat"><div class="num" id="statExpired">0</div><div class="label">Hết hạn</div></div>
+  </div>
+
+  <div class="card">
+    <h2>➕ Tạo KEY mới</h2>
+    <form id="createForm">
+      <div class="form-row-3">
+        <div class="form-group">
+          <label for="keyType">Loại KEY</label>
+          <select id="keyType" required>
+            <option value="M1">M1</option>
+            <option value="M2">M2</option>
+            <option value="M3">M3</option>
+            <option value="Vĩnh viễn">Vĩnh viễn</option>
+            <option value="Tự do">Tự do</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="keyPrefix">Tiền tố</label>
+          <input type="text" id="keyPrefix" placeholder="VD: HQ" maxlength="6" value="HQ" />
+        </div>
+        <div class="form-group">
+          <label for="keyQty">Số lượng</label>
+          <input type="number" id="keyQty" min="1" max="100" value="1" required />
+        </div>
+      </div>
+
+      <div class="form-row-3">
+        <div class="form-group">
+          <label for="durationValue">Thời hạn (trống = vĩnh viễn)</label>
+          <input type="number" id="durationValue" min="1" placeholder="VD: 30" />
+        </div>
+        <div class="form-group">
+          <label for="durationUnit">Đơn vị</label>
+          <select id="durationUnit">
+            <option value="hours">Giờ</option>
+            <option value="days" selected>Ngày</option>
+            <option value="months">Tháng</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="maxUses">Số lần dùng (trống = vô hạn)</label>
+          <input type="number" id="maxUses" min="1" placeholder="VD: 10" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="keyNote">Ghi chú</label>
+        <input type="text" id="keyNote" placeholder="VD: Tặng Khánh lớp 11A1" />
+      </div>
+
+      <button type="submit" class="btn btn-primary">🚀 Tạo KEY</button>
+      <div class="msg" id="createMsg"></div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>📋 Danh sách KEY</h2>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+      <button class="btn btn-ghost btn-sm filter-btn active" data-filter="all">Tất cả</button>
+      <button class="btn btn-ghost btn-sm filter-btn" data-filter="active">Hoạt động</button>
+      <button class="btn btn-ghost btn-sm filter-btn" data-filter="locked">Đã khóa</button>
+      <button class="btn btn-ghost btn-sm filter-btn" data-filter="expired">Hết hạn</button>
+      <input type="text" id="searchInput" placeholder="🔍 Tìm KEY..." style="flex:1; min-width:180px; padding:8px 12px; background:rgba(6,12,30,0.85); border:1px solid rgba(0,229,255,0.3); border-radius:8px; color:var(--text);" />
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>KEY</th><th>Loại</th><th>Hạn</th><th>Lượt</th><th>Trạng thái</th><th>Ghi chú</th><th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="keyTableBody">
+          <tr><td colspan="7" style="text-align:center; color:var(--muted); padding:30px;">Đang tải...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getDatabase, ref, push, set, update, onValue
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBgMM_kWB6jDjTYgP2j-GEnMXKXTwxDdss",
+  authDomain: "hongquan-web.firebaseapp.com",
+  databaseURL: "https://hongquan-web-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "hongquan-web",
+  storageBucket: "hongquan-web.firebasestorage.app",
+  messagingSenderId: "117599956210",
+  appId: "1:117599956210:web:492dc0a9c290c4e346346b"
+};
+
+const ADMIN_PASSWORD = "machongquanadminweb1311";
+const SESSION_KEY = "hq_admin_session";
+const DB_PATH_KEYS = "keys";
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const loginView = document.getElementById("loginView");
+const mainView = document.getElementById("mainView");
+const loginForm = document.getElementById("loginForm");
+const loginMsg = document.getElementById("loginMsg");
+const passwordInput = document.getElementById("password");
+const logoutBtn = document.getElementById("logoutBtn");
+const refreshBtn = document.getElementById("refreshBtn");
+const createForm = document.getElementById("createForm");
+const createMsg = document.getElementById("createMsg");
+const keyTableBody = document.getElementById("keyTableBody");
+const toast = document.getElementById("toast");
+const searchInput = document.getElementById("searchInput");
+
+let allKeys = [];
+let currentFilter = "all";
+let searchTerm = "";
+let unsubscribe = null;
+
+function showToast(text, isError = false) {
+  toast.textContent = text;
+  toast.className = "toast show" + (isError ? " error" : "");
+  setTimeout(() => toast.className = "toast", 2500);
+}
+
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (passwordInput.value === ADMIN_PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, "1");
+    showMain();
+  } else {
+    loginMsg.textContent = "❌ Sai mật khẩu!";
+    loginMsg.className = "msg error show";
+    passwordInput.value = "";
+  }
+});
+
+function checkSession() {
+  if (sessionStorage.getItem(SESSION_KEY) === "1") showMain();
+}
+
+function showMain() {
+  loginView.classList.add("hidden");
+  mainView.classList.remove("hidden");
+  loadKeys();
+}
+
+logoutBtn.addEventListener("click", () => {
+  sessionStorage.removeItem(SESSION_KEY);
+  if (unsubscribe) unsubscribe();
+  location.reload();
+});
+
+refreshBtn.addEventListener("click", () => { showToast("Đã làm mới"); loadKeys(); });
+
+function generateKey(prefix, type) {
+  const typeShort = (type || "XX").toString().replace(/\s+/g, "").substring(0, 3).toUpperCase();
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let rand = "";
+  for (let i = 0; i < 10; i++) rand += chars.charAt(Math.floor(Math.random() * chars.length));
+  const pfx = (prefix || "HQ").toUpperCase().substring(0, 6);
+  return `${pfx}-${typeShort}-${rand.substring(0,5)}-${rand.substring(5,10)}`;
+}
+
+createForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  createMsg.className = "msg";
+
+  const type = document.getElementById("keyType").value;
+  const prefix = document.getElementById("keyPrefix").value.trim() || "HQ";
+  const qty = parseInt(document.getElementById("keyQty").value) || 1;
+  const durVal = document.getElementById("durationValue").value.trim();
+  const durUnit = document.getElementById("durationUnit").value;
+  const maxUsesRaw = document.getElementById("maxUses").value.trim();
+  const note = document.getElementById("keyNote").value.trim();
+
+  let expiresAt = null;
+  if (durVal) {
+    const v = parseInt(durVal);
+    let ms = 0;
+    if (durUnit === "hours") ms = v * 3600 * 1000;
+    else if (durUnit === "days") ms = v * 86400 * 1000;
+    else if (durUnit === "months") ms = v * 30 * 86400 * 1000;
+    expiresAt = Date.now() + ms;
+  }
+  const maxUses = maxUsesRaw ? parseInt(maxUsesRaw) : null;
+
+  createMsg.textContent = "⏳ Đang tạo KEY...";
+  createMsg.className = "msg success show";
+
+  try {
+    const createdKeys = [];
+    for (let i = 0; i < qty; i++) {
+      const newKey = generateKey(prefix, type);
+      const keyRef = push(ref(db, DB_PATH_KEYS));
+      await set(keyRef, {
+        key: newKey, type, createdAt: Date.now(),
+        expiresAt, maxUses, usedCount: 0,
+        status: "active", note
+      });
+      createdKeys.push(newKey);
+    }
+    createMsg.innerHTML = "✅ Đã tạo <b>" + qty + "</b> KEY!<br><br>" +
+      createdKeys.map(k => `<code style="color:#6effc0;">${k}</code>`).join("<br>");
+    createMsg.className = "msg success show";
+    createForm.reset();
+    document.getElementById("keyPrefix").value = "HQ";
+    document.getElementById("keyQty").value = "1";
+    showToast("Đã tạo " + qty + " KEY");
+  } catch (err) {
+    createMsg.textContent = "❌ Lỗi: " + err.message;
+    createMsg.className = "msg error show";
+  }
+});
+
+function loadKeys() {
+  if (unsubscribe) unsubscribe();
+  unsubscribe = onValue(ref(db, DB_PATH_KEYS), (snapshot) => {
+    const data = snapshot.val() || {};
+    allKeys = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+    updateStats();
+    renderTable();
+  }, (err) => {
+    keyTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--red); padding:30px;">❌ Lỗi: ${err.message}</td></tr>`;
+  });
+}
+
+function updateStats() {
+  let a = 0, l = 0, e = 0;
+  allKeys.forEach(k => {
+    const st = getStatus(k);
+    if (st === "active") a++;
+    else if (st === "locked") l++;
+    else if (st === "expired") e++;
+  });
+  document.getElementById("statTotal").textContent = allKeys.length;
+  document.getElementById("statActive").textContent = a;
+  document.getElementById("statLocked").textContent = l;
+  document.getElementById("statExpired").textContent = e;
+}
+
+function getStatus(k) {
+  if (k.status === "locked") return "locked";
+  if (k.expiresAt && Date.now() > k.expiresAt) return "expired";
+  return "active";
+}
+
+function renderTable() {
+  let list = allKeys.slice();
+  if (currentFilter !== "all") list = list.filter(k => getStatus(k) === currentFilter);
+  if (searchTerm) {
+    const s = searchTerm.toLowerCase();
+    list = list.filter(k =>
+      (k.key || "").toLowerCase().includes(s) ||
+      (k.note || "").toLowerCase().includes(s)
+    );
+  }
+  list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  if (list.length === 0) {
+    keyTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:30px;">Không có KEY nào</td></tr>`;
+    return;
+  }
+
+  keyTableBody.innerHTML = list.map(k => {
+    const st = getStatus(k);
+    const stLabel = { active: "Hoạt động", locked: "Đã khóa", expired: "Hết hạn" }[st];
+    const expiresText = k.expiresAt
+      ? formatDate(k.expiresAt) + (st === "expired" ? " ⚠️" : "")
+      : "♾️ Vĩnh viễn";
+    const usesText = k.maxUses ? `${k.usedCount || 0} / ${k.maxUses}` : `${k.usedCount || 0} / ∞`;
+
+    return `
+      <tr>
+        <td class="key-cell" onclick="copyKey('${k.key}')" title="Bấm để copy">${k.key}</td>
+        <td>${k.type || "-"}</td>
+        <td>${expiresText}</td>
+        <td>${usesText}</td>
+        <td><span class="badge ${st}">${stLabel}</span></td>
+        <td style="color:var(--muted); font-size:13px;">${escapeHtml(k.note || "")}</td>
+        <td>
+          <button class="btn btn-sm ${st === "locked" ? "btn-success" : "btn-secondary"}"
+                  onclick="toggleLock('${k.id}', '${k.status}')">
+            ${st === "locked" ? "🔓 Mở" : "🔒 Khóa"}
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="deleteKey('${k.id}')">🗑️</button>
+        </td>
+      </tr>`;
+  }).join("");
+}
+
+function formatDate(ts) {
+  return new Date(ts).toLocaleString("vi-VN", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+}
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+window.copyKey = function(key) {
+  navigator.clipboard.writeText(key).then(() => showToast("Đã copy: " + key));
+};
+
+window.toggleLock = async function(id, currentStatus) {
+  try {
+    const newStatus = currentStatus === "locked" ? "active" : "locked";
+    await update(ref(db, `${DB_PATH_KEYS}/${id}`), { status: newStatus });
+    showToast(newStatus === "locked" ? "Đã khóa KEY" : "Đã mở KEY");
+  } catch (err) { showToast("Lỗi: " + err.message, true); }
+};
+
+window.deleteKey = async function(id) {
+  if (!confirm("Xóa KEY này? Không hoàn tác được!")) return;
+  try {
+    const { remove } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
+    await remove(ref(db, `${DB_PATH_KEYS}/${id}`));
+    showToast("Đã xóa KEY");
+  } catch (err) { showToast("Lỗi: " + err.message, true); }
+};
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.dataset.filter;
+    renderTable();
+  });
+});
+
+searchInput.addEventListener("input", (e) => {
+  searchTerm = e.target.value;
+  renderTable();
+});
+
+checkSession();
+</script>
+</body>
+</html>
